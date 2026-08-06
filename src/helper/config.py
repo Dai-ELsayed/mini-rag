@@ -6,8 +6,8 @@ class Settings(BaseSettings):
     APP_VERSION: str
     OPENAI_API_KEY: str
 
-    # FILE_ALLOWED_TYPES: List[str]
-    # FILE_MAX_SIZE: int
+    FILE_ALLOWED_TYPES: List
+    FILE_MAX_SIZE: int
     # FILE_DEFAULTE_CHUNK_SIZE: int
 
     model_config=SettingsConfigDict(
