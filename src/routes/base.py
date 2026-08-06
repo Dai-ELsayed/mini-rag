@@ -10,7 +10,8 @@ base_router=APIRouter(
 @base_router.get("/")
 async def welcome(app_setting : Settings = Depends(get_settings)): # more efficent
     # app_setting= get_settings()
-    # app_name=os.getenv("APP_NAME") when use load env
+    ##when use load env
+    # app_name=os.getenv("APP_NAME") 
     # app_version=os.getenv("APP_VERSION")
     app_name= app_setting.APP_NAME
     app_version= app_setting.APP_VERSION
