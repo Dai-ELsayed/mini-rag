@@ -2,8 +2,10 @@ from fastapi import FastAPI, APIRouter, Depends, UploadFile , status
 from fastapi.responses import JSONResponse
 import os
 from helper.config import get_settings, Settings
-# from controllers import DataController
-from controllers.DataController import DataController
+from controllers import DataController, ProjectController
+from models import ResponseSignal
+# from controllers.DataController import DataController
+import aiofiles
 
 
 data_router= APIRouter(
@@ -27,6 +29,22 @@ app_settings : Settings = Depends(get_settings)):
                 "result_signal":result_signal
 
             })
+    project_path_dir=ProjectController().get_project_path(project_id)
+    file_path= os.path.join(
+        project_path_dir,
+        file.filename
+    )
+
+    async with aiofiles.open(file_path, "wb") as f:
+        while chunk := await file.read(app_settings.FILE_DEFAULTE_CHUNK_SIZE):
+            await f.write(chunk)
+    
+    return JSONResponse(
+     content={
+         "signal":ResponseSignal.FILE_UPLOAD_SUCCESS.value
+     }   
+    )
+    
         
 
     
