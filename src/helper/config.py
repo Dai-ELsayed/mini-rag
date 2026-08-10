@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     FILE_ALLOWED_TYPES: List
     FILE_MAX_SIZE: int
-    # FILE_DEFAULTE_CHUNK_SIZE: int
+    FILE_DEFAULTE_CHUNK_SIZE: int
 
     model_config=SettingsConfigDict(
         env_file='.env',
