@@ -7,6 +7,7 @@ from models import ResponseSignal
 # from controllers.DataController import DataController
 import aiofiles
 import logging
+from .schema.data import ProcessRequest
 
 logger=logging.getLogger("uvicorn.error")
 
@@ -58,6 +59,12 @@ app_settings : Settings = Depends(get_settings)):
          'file_id':file_id
      }   
     )
+
+@data_router.post("/process/{project_id}")
+async def process_endpoint(project_id: str, ProcessRequest:ProcessRequest):
+    file_id =ProcessRequest.file_id
+
+    return file_id
     
         
 
