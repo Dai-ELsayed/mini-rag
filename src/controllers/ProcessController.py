@@ -41,4 +41,21 @@ class ProcessController(BaseController):
             chunk_overlap=overlap_size,
             length_function=len,
         )
+
+        file_content_texts=[
+            rec.page_content
+            for rec in file_content
+        ]
+
+        file_content_metadata=[
+            rec.metadata
+            for rec in file_content
+        ]
+
+        chunks=text_splitter.create_documents(
+            file_content_texts,
+            metadatas=file_content_metadata
+        )
+
+        return chunks
           
