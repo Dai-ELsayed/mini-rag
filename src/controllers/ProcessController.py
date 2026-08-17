@@ -3,6 +3,7 @@ from .ProjectController import ProjectController
 import os
 from langchain_community.document_loaders import TextLoader
 from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from models import ProcessingEnum
 
 class ProcessController(BaseController):
@@ -28,3 +29,16 @@ class ProcessController(BaseController):
         if file_ext== ProcessingEnum.PDF.value:
             return PyMuPDFLoader(file_path)
         return None
+
+    def get_file_content(self, file_id: str):
+        loader= self.get_file_loader(file_id=file_id)
+        return loader.load()
+
+    def process_file_content(self, file_id: str, file_content:list, 
+                             chunk_size:int=100, overlap_size:int=20):
+        text_splitter=RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=overlap_size,
+            length_function=len,
+        )
+          
