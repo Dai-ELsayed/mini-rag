@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     FILE_MAX_SIZE: int
     FILE_DEFAULTE_CHUNK_SIZE: int
 
+    MONGODP_URL: str
+    MONGODP_DATABASE : str
     model_config=SettingsConfigDict(
         env_file='.env',
         env_file_encoding="utf-8"
