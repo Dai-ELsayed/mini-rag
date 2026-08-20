@@ -2,8 +2,8 @@ from pydantic import Field, BaseModel, field_validator
 from typing import Optional
 from bson.objectid import ObjectId  # from motor
 
-class chunk(BaseModel):
-    id : Optional[ObjectId]
+class DataChunk(BaseModel):
+    _id : Optional[ObjectId]
     chunk_text: str = Field(..., min_length=1)
     chunk_metadata: dict
     chunk_order: int = Field(..., gt=0)

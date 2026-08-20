@@ -2,7 +2,7 @@ from fastapi import FastAPI
 # from dotenv import load_dotenv
 # load_dotenv(".env")
 from routes import base, data
-from motor.motor_asyncio import ASYNCIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from contextlib import asynccontextmanager
 from helper.config import get_settings
 
@@ -10,7 +10,7 @@ from helper.config import get_settings
 async def lifespan(app: FastAPI):
     #startup
     settings= get_settings()
-    app.mongo_conn=ASYNCIOMotorClient(settings.MONGODP_URL)
+    app.mongo_conn=AsyncIOMotorClient(settings.MONGODP_URL)
     app.db_client=app.mongo_conn[settings.MONGODP_DATABASE]
 
     yield
