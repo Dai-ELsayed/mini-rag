@@ -9,6 +9,8 @@ from models.ProjectModel import ProjectModel
 import aiofiles
 import logging
 from .schema.data import ProcessRequest
+from models.db_schemes import DataChunk
+from models.ChunkModel import ChunkModel
 
 logger=logging.getLogger("uvicorn.error")
 
@@ -62,17 +64,25 @@ app_settings : Settings = Depends(get_settings)):
      content={
          "signal":ResponseSignal.FILE_UPLOAD_SUCCESS.value,
          'file_id':file_id,
-         "project_id": str(project._id)
+         "project_id": str(project.id)
      }   
     )
 
 @data_router.post("/process/{project_id}")
-async def process_endpoint(project_id: str, ProcessRequest:ProcessRequest):
+async def process_endpoint(Request:Request,project_id: str, ProcessRequest:ProcessRequest):
     file_id =ProcessRequest.file_id
     chunk_size=ProcessRequest.chunk_size
     overlap_size=ProcessRequest.overlap_size
+    do_reset= ProcessRequest.do_reset
+
+    project_model=ProjectModel(db_client=Request.app.db_client)
+    project= await project_model.get_project_or_create_one(
+            project_id=project_id
+        )
+    
 
     processcontroller=ProcessController(project_id=project_id)
+
 
     file_content=processcontroller.get_file_content(file_id=file_id)
 
@@ -91,7 +101,35 @@ async def process_endpoint(project_id: str, ProcessRequest:ProcessRequest):
             }
         )
 
-    return file_chunks
+    file_chunks_records=[
+        DataChunk(
+            chunk_text=chunk.page_content,
+            chunk_metadata=chunk.metadata,
+            chunk_order=i+1,
+            chunk_project_id=project.id,
+        )
+        for i , chunk in enumerate(file_chunks)
+    ]
+
+    chunk_model=ChunkModel(db_client=Request.app.db_client)
+
+
+
+    if do_reset == 1:
+        deleted_count = await chunk_model.delete_chunks_by_project_id(
+            project_id=project.id
+        )
+
+
+    no_records = await chunk_model.insert_many_chunks(chunks=file_chunks_records)
+
+    return JSONResponse(
+        content={
+            "signal": ResponseSignal.PROCESSING_SUCCESS.value,
+            "inserted_chunks": no_records
+        }
+    )
+
 
 
     

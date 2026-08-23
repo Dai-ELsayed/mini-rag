@@ -10,8 +10,8 @@ class ChunkModel(BaseDataModel):
         self.collection= self.db_client[DataBaseEnum.COLLECTION_CHUNK_NAME.value]
 
     async def create_chunk(self, chunk:DataChunk):
-        result= await self.collection.insert_one(chunk.model_dump())
-        chunk._id= result.inserted_id
+        result= await self.collection.insert_one(chunk.model_dump(by_alias=True, exclude_unset=True))
+        chunk.id= result.inserted_id
         return chunk
 
     async def get_chunk(self, chunk_id:str):
@@ -29,11 +29,11 @@ class ChunkModel(BaseDataModel):
         for i in range(0,len(chunks), batch_size):
             batch= chunks[i:i+batch_size]
 
-            operations=(
+            operations=[
 
-                InsertOne(chunk.model_dump())
+                InsertOne(chunk.model_dump(by_alias=True, exclude_unset=True))
                 for chunk in batch
-            )
+            ]
 
             await self.collection.bulk_write(operations)
 
