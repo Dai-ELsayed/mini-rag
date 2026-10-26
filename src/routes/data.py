@@ -10,7 +10,10 @@ import aiofiles
 import logging
 from .schema.data import ProcessRequest
 from models.db_schemes import DataChunk
+from models.db_schemes import Asset
+from models.AssetModel import AssetModel
 from models.ChunkModel import ChunkModel
+from models.enums.AssetTypeEnum import AssetTypeEnum
 
 logger=logging.getLogger("uvicorn.error")
 
@@ -59,14 +62,30 @@ app_settings : Settings = Depends(get_settings)):
         content={
             "result_signal":ResponseSignal.FILE_UPLOAD_FAILED.value
             })
-    
-    return JSONResponse(
-     content={
-         "signal":ResponseSignal.FILE_UPLOAD_SUCCESS.value,
-         'file_id':file_id,
-         "project_id": str(project.id)
-     }   
+
+
+        # store the assets into the database
+    asset_model = await AssetModel.creat_instance(db_client=Request.app.db_client)
+
+    asset_resource = Asset(
+        asset_project_id=project.id,
+        asset_type=AssetTypeEnum.FILE.value,
+        asset_name=file_id,
+        asset_size=os.path.getsize(file_path)
     )
+
+    asset_record = await asset_model.creat_asset(asset=asset_resource)
+
+    return JSONResponse(
+            content={
+                "signal": ResponseSignal.FILE_UPLOAD_SUCCESS.value,
+                "file_id": str(asset_record.id),
+            }
+        )
+
+
+
+
 
 @data_router.post("/process/{project_id}")
 async def process_endpoint(Request:Request,project_id: str, ProcessRequest:ProcessRequest):
