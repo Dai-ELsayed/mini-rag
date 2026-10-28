@@ -22,19 +22,19 @@ class Asset(BaseModel):
             return[
                 {
                     'key':[
-                        ('assete_project_id',1)
+                        ('asset_project_id',1)
                     ],
 
-                    'name':'assete_project_id_index_1',
+                    'name':'asset_project_id_index_1',
                     'unique': False
                 },
                 {
                     'key':[
-                            ('assete_project_id',1),
-                            ('assete_name', 1)
+                            ('asset_project_id',1),
+                            ('asset_name', 1)
                     ],
                     
-                    'name':'assete_project_id_name_index_1',
+                    'name':'asset_project_id_name_index_1',
                     'unique': True
                     
                 }
