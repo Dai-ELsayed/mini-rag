@@ -28,9 +28,8 @@ async def uploade_data(Request:Request, project_id: str, file: UploadFile,
 app_settings : Settings = Depends(get_settings)):
 
     project_model= await ProjectModel.creat_instance(db_client=Request.app.db_client)
-    project= await project_model.get_project_or_create_one(
-        project_id=project_id
-    )
+    project= await project_model.get_project_or_create_one(project_id=project_id)
+
     #we validate data(the logic) in DataController
     # validate
     data_controller=DataController()
@@ -43,6 +42,7 @@ app_settings : Settings = Depends(get_settings)):
                 "result_signal":result_signal
 
             })
+    
     project_path_dir=ProjectController().get_project_path(project_id)
     file_path, file_id= data_controller.generate_unique_filepath(
         orig_file_name=file.filename,
@@ -96,8 +96,6 @@ async def process_endpoint(Request:Request,project_id: str, ProcessRequest:Proce
 
     project_model= await ProjectModel.creat_instance(db_client=Request.app.db_client)
     project= await project_model.get_project_or_create_one( project_id=project_id )
-    # asset_model = await AssetModel.create_instance(db_client=Request.app.db_client)
-
     asset_model = await AssetModel.creat_instance(db_client=Request.app.db_client)
 
     project_files_ids = {}

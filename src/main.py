@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 # from dotenv import load_dotenv
 # load_dotenv(".env")
-from routes import base, data
+from routes import base, data_endpoints
 from motor.motor_asyncio import AsyncIOMotorClient
 from contextlib import asynccontextmanager
 from helper.config import get_settings
@@ -22,5 +22,5 @@ async def lifespan(app: FastAPI):
 app=FastAPI(lifespan=lifespan)
 
 app.include_router(base.base_router)
-app.include_router(data.data_router)
+app.include_router(data_endpoints.data_router)
 
