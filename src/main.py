@@ -4,6 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from contextlib import asynccontextmanager
 from helper.config import get_settings   # from dotenv import load_dotenv # load_dotenv(".env")
 from stores.llm.LLMProviderFactory import LLMProviderFactory
+from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
 
 
 @asynccontextmanager
@@ -14,6 +15,7 @@ async def lifespan(app: FastAPI):
     app.db_client=app.mongo_conn[settings.MONGODP_DATABASE]
 
     llm_provider_factory=LLMProviderFactory(settings)
+    vector_provider_factory=VectorDBProviderFactory(settings)
 
     # generation client
     app.generation_client=llm_provider_factory.create(provider=settings.GENERATION_BACKEND)
@@ -34,10 +36,16 @@ async def lifespan(app: FastAPI):
     app.embedding_client.set_embedding_model(model_id=settings.EMBEDDING_MODEL_ID,
                                               embedding_size=settings.EMBEDDING_MODEL_SIZE)
 
+    # vector db client
+    app.vectordb_client=vector_provider_factory.creat(provider=settings.VECTOR_DB_BACKEND)
+    app.vectordb_client.connect()
+
+
     yield
 
     # Shutdown
     app.mongo_conn.close()
+    app.vectordb_client.disconnect()
 
     
 app=FastAPI(lifespan=lifespan)
